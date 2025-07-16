@@ -112,3 +112,235 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", List.of(ex.getMessage()));
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{
+        "info": {
+        "_postman_id": "c492c3fd-5d5a-4dd8-bf12-17970373399e",
+        "name": "EmployeeProject",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "_exporter_id": "46192515",
+        "_collection_link": "https://sahildsalunke.postman.co/workspace/Sahil-D-Salunke's-Workspace~8d654cb0-1b8e-476e-89fc-c558cbfd0b38/collection/46192515-c492c3fd-5d5a-4dd8-bf12-17970373399e?action=share&source=collection_link&creator=46192515"
+        },
+        "item": [
+        {
+        "name": "Get all Employee",
+        "request": {
+        "auth": {
+        "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+        "raw": "http://localhost:8061/employee/all",
+        "protocol": "http",
+        "host": [
+        "localhost"
+        ],
+        "port": "8061",
+        "path": [
+        "employee",
+        "all"
+        ]
+        }
+        },
+        "response": []
+        },
+        {
+        "name": "Add Multiple Employees",
+        "request": {
+        "auth": {
+        "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+        "mode": "raw",
+        "raw": "[\r\n    {\r\n    \"emp_id\": 1,\r\n    \"emp_name\": \"Ram\",\r\n    \"designation\": \"Manager\"\r\n    },\r\n    {\r\n    \"emp_id\": 2,\r\n    \"emp_name\": \"Sham\",\r\n    \"designation\": \"Lead\"\r\n    },\r\n    {\r\n    \"emp_id\": 3,\r\n    \"emp_name\": \"Sahil\",\r\n    \"designation\": \"Software Developer\"\r\n    }\r\n\r\n]",
+        "options": {
+        "raw": {
+        "language": "json"
+        }
+        }
+        },
+        "url": {
+        "raw": "http://localhost:8061/employee/addMulti",
+        "protocol": "http",
+        "host": [
+        "localhost"
+        ],
+        "port": "8061",
+        "path": [
+        "employee",
+        "addMulti"
+        ]
+        }
+        },
+        "response": []
+        },
+        {
+        "name": "Add New Employee",
+        "request": {
+        "auth": {
+        "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+        "mode": "raw",
+        "raw": "{\r\n    \"emp_id\": 4,\r\n    \"emp_name\": \"Badhir\",\r\n    \"designation\": \"QA\"\r\n    }",
+        "options": {
+        "raw": {
+        "language": "json"
+        }
+        }
+        },
+        "url": {
+        "raw": "http://localhost:8061/employee/add",
+        "protocol": "http",
+        "host": [
+        "localhost"
+        ],
+        "port": "8061",
+        "path": [
+        "employee",
+        "add"
+        ]
+        }
+        },
+        "response": []
+        },
+        {
+        "name": "Update Employee",
+        "request": {
+        "auth": {
+        "type": "noauth"
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+        "mode": "raw",
+        "raw": "{\r\n    \"emp_id\": 4,\r\n    \"emp_name\": \"Murkh\",\r\n    \"designation\": \"QA\"\r\n}",
+        "options": {
+        "raw": {
+        "language": "json"
+        }
+        }
+        },
+        "url": {
+        "raw": "http://localhost:8061/employee/update",
+        "protocol": "http",
+        "host": [
+        "localhost"
+        ],
+        "port": "8061",
+        "path": [
+        "employee",
+        "update"
+        ]
+        }
+        },
+        "response": []
+        },
+        {
+        "name": "Get Employee By Id",
+        "request": {
+        "auth": {
+        "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+        "raw": "http://localhost:8061/employee/id/3",
+        "protocol": "http",
+        "host": [
+        "localhost"
+        ],
+        "port": "8061",
+        "path": [
+        "employee",
+        "id",
+        "3"
+        ]
+        }
+        },
+        "response": []
+        },
+        {
+        "name": "Delete Emplyee By Id",
+        "request": {
+        "auth": {
+        "type": "noauth"
+        },
+        "method": "DELETE",
+        "header": [],
+        "body": {
+        "mode": "raw",
+        "raw": "{\r\n    \"emp_id\": 1,\r\n    \"emp_name\": \"Sham\",\r\n    \"designation\": \"Manager\"\r\n}",
+        "options": {
+        "raw": {
+        "language": "json"
+        }
+        }
+        },
+        "url": {
+        "raw": "http://localhost:8061/employee/remove/4",
+        "protocol": "http",
+        "host": [
+        "localhost"
+        ],
+        "port": "8061",
+        "path": [
+        "employee",
+        "remove",
+        "4"
+        ]
+        }
+        },
+        "response": []
+        }
+        ]
+        }
