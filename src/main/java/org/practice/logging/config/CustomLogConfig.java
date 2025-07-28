@@ -29,7 +29,7 @@ public class CustomLogConfig {
                         "%blue([" + projectName + "]) " +                   // Project name in blue
                         "%cyan(%class -> %M) " +                         // File → Class in cyan
                         ":%line " +                                         // Line number (default color)
-                        "%yellow(errorCode=%X{errorCode}) " +                 // errorCode in yellow
+                        "%yellow(error=%X{errorCode}) " +                 // errorCode in yellow
                         "%msg%n"                                            // Message (default terminal/IDE color)
         );
         encoder.start();
