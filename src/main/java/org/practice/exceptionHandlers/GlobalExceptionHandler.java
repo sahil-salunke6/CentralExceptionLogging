@@ -1,9 +1,12 @@
 package org.practice.exceptionHandlers;
 
+import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,25 +18,43 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    @Autowired
+    public HttpServletRequest httpServletRequest;
+
+    /**
+     * generate a correlationId for a unique custom error response
+     *
+     * @return unique id
+     */
+    private String getCorrelationId() {
+        String guId = httpServletRequest.getHeader("correlationId");
+        String traceId = MDC.get("traceId");
+
+        if (StringUtils.isNotBlank(guId)) {
+            return guId;
+        } else {
+            if (StringUtils.isNotEmpty(traceId)) {
+                return traceId;
+            }
+            return UUID.randomUUID().toString();
+        }
+    }
 
     private ResponseEntity<Object> buildError(HttpStatus status, String message, List<String> details) {
         Map<String, Object> body = new LinkedHashMap<>();
+        body.put("requestId", getCorrelationId());
         body.put("timestamp", LocalDateTime.now());
         body.put("status", status.value());
         body.put("error", status.getReasonPhrase());
         body.put("message", message);
         body.put("details", details);
-        logger.error("[{} {}] - {} | Details: {}", status.value(), status, message, details);
         return new ResponseEntity<>(body, status);
     }
 
@@ -43,14 +64,16 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(e -> e.getField() + ": " + e.getDefaultMessage())
                 .collect(Collectors.toList());
-        logger.warn("Validation failed: {}", errors);
-        return buildError(HttpStatus.BAD_REQUEST, "Validation Failed", errors);
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        log.error("[{}] | {}", status, errors);
+        return buildError(status, "Validation Failed", errors);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException ex) {
-        logger.error("Entity not found: {}", ex.getMessage());
-        return buildError(HttpStatus.NOT_FOUND, "Entity Not Found", List.of(ex.getMessage()));
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        log.error("[{}] | {}", status, ex.getMessage());
+        return buildError(status, "Entity Not Found", List.of(ex.getMessage()));
     }
 
     @ExceptionHandler(DataAccessException.class)
@@ -59,14 +82,16 @@ public class GlobalExceptionHandler {
                 .map(Throwable::getMessage)
                 .orElse("Database error occurred");
 
-        logger.error("Database access error: {}", message, ex);
-        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Database error", List.of(message));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        log.error("[{}] | {}", status, message, ex);
+        return buildError(status, "Database error", List.of(message));
     }
 
     @ExceptionHandler(MakerCheckerException.class)
     public ResponseEntity<Object> handleMakerCheckerError(MakerCheckerException ex) {
-        logger.error("Maker-Checker business rule violation: {}", ex.getMessage());
-        return buildError(HttpStatus.BAD_REQUEST, "Maker-Checker Error", List.of(ex.getMessage()));
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        log.error("[{}] | {}", status, ex.getMessage());
+        return buildError(status, "Maker-Checker Error", List.of(ex.getMessage()));
     }
 
 // --- Swagger related exceptions ---
@@ -74,21 +99,24 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<Object> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
         String msg = String.format("Parameter '%s' should be of type %s", ex.getName(), ex.getRequiredType().getSimpleName());
-        logger.warn("Type mismatch: {}", msg);
-        return buildError(HttpStatus.BAD_REQUEST, "Type Mismatch", List.of(msg));
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        log.error("[{}] | {}", status, msg);
+        return buildError(status, "Type Mismatch", List.of(msg));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Object> handleUnreadable(HttpMessageNotReadableException ex) {
         String msg = "Malformed JSON request or invalid input format";
-        logger.warn("Unreadable message: {}", ex.getMessage());
-        return buildError(HttpStatus.BAD_REQUEST, "Bad Request", List.of(msg));
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        log.error("[{}] | {}", status, ex.getMessage());
+        return buildError(status, "Bad Request", List.of(msg));
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<Object> handleMissingParam(MissingServletRequestParameterException ex) {
         String msg = String.format("Missing required parameter: %s", ex.getParameterName());
-        logger.warn("Missing parameter: {}", msg);
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        log.error("[{}] | {}", status, msg);
         return buildError(HttpStatus.BAD_REQUEST, "Missing Parameter", List.of(msg));
     }
 
@@ -99,8 +127,9 @@ public class GlobalExceptionHandler {
                 .map(v -> v.getPropertyPath() + ": " + v.getMessage())
                 .collect(Collectors.toList());
 
-        logger.warn("Constraint violations: {}", errors);
-        return buildError(HttpStatus.BAD_REQUEST, "Validation Error", errors);
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        log.error("[{}] | {}", status, errors);
+        return buildError(status, "Validation Error", errors);
     }
 
 // --------
@@ -108,7 +137,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleUncaught(Exception ex) {
-        logger.error("Uncaught exception: {}", ex.getMessage(), ex);
-        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", List.of(ex.getMessage()));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        log.error("[{}] | {}", status, ex.getMessage());
+        return buildError(status, "Internal Server Error", List.of(ex.getMessage()));
     }
 }
