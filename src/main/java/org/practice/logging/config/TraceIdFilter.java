@@ -1,22 +1,26 @@
 package org.practice.logging.config;
 
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanContext;
 import jakarta.servlet.*;
-import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.UUID;
 
 @Component
 public class TraceIdFilter implements Filter {
+
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-
         try {
-            String traceId = UUID.randomUUID().toString();
-            MDC.put("traceId", traceId);
+            Span span = Span.current();
+            SpanContext ctx = span.getSpanContext();
+            if (ctx.isValid()) {
+                MDC.put("traceId", ctx.getTraceId());
+                MDC.put("spanId", ctx.getSpanId());
+            }
             chain.doFilter(request, response);
         } finally {
             MDC.clear();
