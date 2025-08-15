@@ -29,6 +29,11 @@ dependencies {
     implementation 'ch.qos.logback:logback-classic:1.5.18'
     implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
 
+    // lombok
+    compileOnly 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+    testCompileOnly 'org.projectlombok:lombok:1.18.28'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
 }
 
 test {
