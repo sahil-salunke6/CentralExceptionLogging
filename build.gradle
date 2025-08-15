@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'jacoco'
 }
 
 group = 'org.practice'
@@ -43,6 +44,34 @@ dependencies {
 
 }
 
+// === TEST CONFIG ===
 test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
+
+// === JACOCO CONFIG ===
+jacoco {
+    toolVersion = "0.8.10"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.80 // Require at least 80% coverage
+            }
+        }
+    }
+}
+
+// Ensure coverage verification runs with `gradle check`
+check.dependsOn jacocoTestCoverageVerification
