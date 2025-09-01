@@ -138,7 +138,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleUncaught(Exception ex) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        log.error("[{}] | {}", status, ex.getMessage());
+        log.error("[{}] | {Hi}", status, ex.getMessage());
         return buildError(status, "Internal Server Error", List.of(ex.getMessage()));
     }
 }
