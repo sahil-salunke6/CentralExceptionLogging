@@ -40,3 +40,12 @@ This setup ensures **better observability, maintainability, and production readi
 git clone https://github.com/sahil-salunke6/CentralExceptionLogging.git
 cd CentralExceptionLogging
 
+---
+
+## 👨‍💻 Author
+
+**Sahil D. Salunke**
+🔗 [LinkedIn](https://www.linkedin.com/in/sahildsalunke/)
+
+---
+
